@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import HelloWorld from "./components/HelloWorld.vue";
+import KMeans from "./components/KMeans.vue";
 
 export const router = createRouter({
   history: createWebHashHistory(),
@@ -7,7 +7,7 @@ export const router = createRouter({
     {
       path: "/",
       name: "Home",
-      component: HelloWorld,
+      component: KMeans,
     },
   ],
 });
