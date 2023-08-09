@@ -25,8 +25,8 @@ const imageDataToRGBList = async (imgData: ImageData): Promise<RGBList> => {
     rgbList.data[Math.floor(i_div_4 / imgData.width)][i_div_4 % imgData.width] =
       {
         red: data[i],
-        blue: data[i + 1],
-        green: data[i + 2],
+        green: data[i + 1],
+        blue: data[i + 2],
       };
   }
   return rgbList;
@@ -41,8 +41,8 @@ const rgbListToImageData = async (rgbList: RGBList): Promise<ImageData> => {
       const rgb = rgbList.data[i][j];
       const offset = (i * rgbList.width + j) * 4;
       data[offset] = rgb.red;
-      data[offset + 1] = rgb.blue;
-      data[offset + 2] = rgb.green;
+      data[offset + 1] = rgb.green;
+      data[offset + 2] = rgb.blue;
       data[offset + 3] = 255;
     }
   }
@@ -53,7 +53,10 @@ const rgbListToImageData = async (rgbList: RGBList): Promise<ImageData> => {
 const kMeans = (
   n: number,
   rgb2dList: RGBList
-): { points: RGB[]; rgb2dListKMean: RGBList } => {
+): {
+  classList: { rgb: RGB; matchLength: number }[];
+  rgb2dListKMean: RGBList;
+} => {
   const getNearClass = (rgb: RGB) => {
     let classNum = 0;
     let minD = 255 * 255 * 3;
@@ -117,8 +120,17 @@ const kMeans = (
     );
   }
 
+  const classList = points.map((v, i) => ({
+    rgb: {
+      red: Math.floor(v.red),
+      green: Math.floor(v.green),
+      blue: Math.floor(v.blue),
+    },
+    matchLength: rgbList.filter((v) => v.class === i).length,
+  }));
+
   return {
-    points,
+    classList,
     rgb2dListKMean: {
       data: sliceByNumber(
         rgbList.map((v) => points[v.class]),
