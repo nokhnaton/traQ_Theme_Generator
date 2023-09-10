@@ -6,27 +6,29 @@ const calcTheme = (rgbList: RGB[]) => {
   const bg = new BackgroundColor({
     name: "bg",
     colorKeys: [getHex(rgbList[0])],
-    ratios: [1, 1.4, 2],
+    ratios: [1, 1.2, 1.4],
   });
 
   const ui = new Color({
     name: "ui",
     colorKeys: [getHex(rgbList[1])],
-    ratios: [9, 7, 6],
+    colorspace: "OKLAB",
+    ratios: [10, 8, 7],
   });
 
   const accent_primary = new Color({
     name: "accent_primary",
     colorKeys: [getHex(rgbList[2])],
-    ratios: [4, 10],
+    colorspace: "OKLAB",
+    ratios: [10, 2],
   });
 
   const chromaBG = chroma([rgbList[0].red, rgbList[0].green, rgbList[0].blue]);
 
   const lightness =
     chromaBG.get("lab.l") > 50
-      ? Math.max(chromaBG.get("lab.l"), 90)
-      : Math.min(chromaBG.get("lab.l"), 15);
+      ? Math.max(chromaBG.get("lab.l"), 95)
+      : Math.min(chromaBG.get("lab.l"), 5);
 
   const theme = new Theme({
     colors: [bg, ui, accent_primary],
@@ -42,7 +44,7 @@ const calcTheme = (rgbList: RGB[]) => {
     version: 2,
     basic: {
       accent: {
-        primary: getHex(rgbList[2]),
+        primary: contrast["accent_primary100"],
         notification: getHex(rgbList[3]),
         online: getHex(rgbList[4]),
         error: getHex(rgbList[5]),
@@ -59,8 +61,8 @@ const calcTheme = (rgbList: RGB[]) => {
         tertiary: contrast["ui300"],
       },
       text: {
-        primary: contrast["ui100"],
-        secondary: getHex(rgbList[2]),
+        primary: contrast["accent_primary200"],
+        secondary: contrast["accent_primary100"],
       },
     },
   };
