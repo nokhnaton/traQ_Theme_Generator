@@ -9,7 +9,7 @@ const worker = new Worker();
 
 const canvas = ref<HTMLCanvasElement>();
 const imgInput = ref<HTMLInputElement>();
-const divNum = ref<number>(6);
+const divNum = ref<number>(10);
 const colors = ref<{ rgb: RGB; matchLength: number }[]>([]);
 const themeString = computed(() =>
   colors.value.length < 6
@@ -81,43 +81,59 @@ const swapColors = (a: number, b: number) => {
   colors.value[a] = colors.value[b];
   colors.value[b] = tmp;
 };
+
+const copyJson = () => {
+  navigator.clipboard
+    .writeText(themeString.value)
+    .then(() => alert("コピーしたよ!"));
+};
 </script>
 
 <template>
-  <canvas ref="canvas"></canvas>
   <div>
-    <input type="file" ref="imgInput" accept="image/*" @change="uploadFile" />
-  </div>
-  <div>抽出色数<input type="number" v-model="divNum" min="6" /></div>
-  <div v-for="(color, i) in colors" :key="JSON.stringify(color)">
-    <div :class="$style.colorList">
-      <input
-        type="color"
-        :value="getHex(colors[i].rgb)"
-        @change="
+    <canvas ref="canvas" :class="$style.canvas"></canvas>
+    <div>
+      <input type="file" ref="imgInput" accept="image/*" @change="uploadFile" />
+    </div>
+    <div>抽出色数<input type="number" v-model="divNum" min="6" /></div>
+    <div v-for="(color, i) in colors" :key="JSON.stringify(color)">
+      <div :class="$style.colorList">
+        <input
+          type="color"
+          :value="getHex(colors[i].rgb)"
+          @change="
           (event) => {
             colors[i].rgb = toRgb((event.target as HTMLInputElement).value)
           }
         "
-      />
-      <div
-        :class="$style.color"
-        :style="{
-          background: `rgb(${color.rgb.red} ${color.rgb.green} ${color.rgb.blue})`,
-        }"
-      >
-        {{ color.matchLength }}
+        />
+        <div
+          :class="$style.color"
+          :style="{
+            background: `rgb(${color.rgb.red} ${color.rgb.green} ${color.rgb.blue})`,
+          }"
+        >
+          {{ color.matchLength }}
+        </div>
+        <div>{{ colorDescription(i) }}</div>
       </div>
-      <div>{{ colorDescription(i) }}</div>
+      <button v-if="i < colors.length - 1" @click="swapColors(i, i + 1)">
+        上下二つの色を入れ替える
+      </button>
     </div>
-    <button v-if="i < colors.length - 1" @click="swapColors(i, i + 1)">
-      上下二つの色を入れ替える
-    </button>
+    <template v-if="themeString">
+      <div :class="$style.code">
+        <code>{{ themeString }}</code>
+      </div>
+      <button @click="copyJson">コピー!</button>
+    </template>
   </div>
-  <code>{{ themeString }}</code>
 </template>
 
 <style module lang="scss">
+.canvas {
+  width: 80%;
+}
 .colorList {
   display: flex;
   gap: 12px;
@@ -125,5 +141,9 @@ const swapColors = (a: number, b: number) => {
 .color {
   width: 50px;
   height: 50px;
+}
+
+.code {
+  text-align: left;
 }
 </style>
